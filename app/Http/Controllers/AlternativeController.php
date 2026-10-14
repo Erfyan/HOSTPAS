@@ -42,4 +42,70 @@ class AlternativeController extends Controller
 
         return response()->json($data);
     }
+
+    /**
+     * Menambahkan alternatif hosting baru untuk simulasi
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'provider' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'spec_raw' => 'nullable|string',
+            'scores' => 'required|array',
+            'scores.C1' => 'required|numeric|min:0',
+            'scores.C2' => 'required|numeric|min:0',
+            'scores.C3' => 'required|numeric|min:0',
+            'scores.C4' => 'required|numeric|min:0',
+        ]);
+
+        // Tentukan kode unik berikutnya
+        $count = Alternative::count();
+        $code = 'A' . ($count + 1);
+        while (Alternative::where('code', $code)->exists()) {
+            $count++;
+            $code = 'A' . ($count + 1);
+        }
+
+        $alternative = Alternative::create([
+            'code' => $code,
+            'provider' => $validated['provider'],
+            'name' => $validated['name'],
+            'category' => $validated['category'] ?? 'Custom Package',
+            'spec_raw' => $validated['spec_raw'] ?? '-',
+        ]);
+
+        $criteria = \App\Models\Criterion::all()->keyBy('code');
+
+        foreach ($validated['scores'] as $codeKey => $scoreVal) {
+            if (isset($criteria[$codeKey])) {
+                \App\Models\Score::create([
+                    'alternative_id' => $alternative->id,
+                    'criterion_id' => $criteria[$codeKey]->id,
+                    'value' => (float)$scoreVal,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Paket hosting alternatif berhasil ditambahkan ke simulasi',
+            'data' => $alternative,
+        ], 201);
+    }
+
+    /**
+     * Menghapus alternatif hosting
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $alternative = Alternative::findOrFail($id);
+        $alternative->delete();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Alternatif berhasil dihapus dari simulasi',
+        ]);
+    }
 }

@@ -165,6 +165,9 @@
 
       <RankingTable :alternatives="top5" :showDetails="true" />
     </SectionCard>
+
+    <!-- Panel Kesimpulan & Insight Cerdas -->
+    <DecisionInsight />
   </div>
 </template>
 
@@ -174,6 +177,7 @@ import { useSpk } from '../composables/useSpk';
 import StatCard from '../components/StatCard.vue';
 import SectionCard from '../components/SectionCard.vue';
 import RankingTable from '../components/RankingTable.vue';
+import DecisionInsight from '../components/DecisionInsight.vue';
 import {
   Server,
   Sliders,

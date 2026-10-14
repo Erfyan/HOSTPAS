@@ -288,6 +288,9 @@
         <RankingTable :alternatives="result.alternatives" :showDetails="true" />
       </SectionCard>
 
+      <!-- Panel Kesimpulan & Rekomendasi Cerdas -->
+      <DecisionInsight />
+
       <!-- GRAFIK VISUALISASI WASPAS -->
       <SectionCard
         title="Visualisasi Grafik Perbandingan Nilai WASPAS (Q)"
@@ -310,6 +313,7 @@ import SectionCard from '../components/SectionCard.vue';
 import StepBadge from '../components/StepBadge.vue';
 import RankingTable from '../components/RankingTable.vue';
 import RankingChart from '../components/RankingChart.vue';
+import DecisionInsight from '../components/DecisionInsight.vue';
 import {
   Calculator,
   Sliders,

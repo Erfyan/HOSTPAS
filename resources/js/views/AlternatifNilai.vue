@@ -8,12 +8,21 @@
           Alternatif Hosting & Nilai Kriteria
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-          Daftar 20 paket hosting dari 4 penyedia terkemuka. Nilai kriteria dapat disunting secara langsung pada tabel di bawah.
+          Daftar paket hosting yang dievaluasi. Anda dapat mengubah nilai secara langsung pada tabel atau menambahkan paket kustom untuk disimulasikan.
         </p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-2 self-start sm:self-auto">
+      <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+        <button
+          type="button"
+          @click="openAddModal"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm px-4 py-2.5 rounded-xl transition flex items-center gap-2 shadow-sm"
+        >
+          <Plus class="w-4 h-4" />
+          <span>Uji Paket Hosting Baru</span>
+        </button>
+
         <button
           type="button"
           @click="handleReset"
@@ -55,7 +64,7 @@
               provider === '' ? 'bg-indigo-600 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             ]"
           >
-            Semua Penyedia (20)
+            Semua Penyedia ({{ alternatives.length }})
           </button>
           <button
             v-for="p in providersList"
@@ -115,6 +124,7 @@
                 C4: CPU
                 <span class="block text-[10px] text-emerald-600 font-normal">vCPU (Benefit)</span>
               </th>
+              <th class="px-4 py-3.5 w-12 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 bg-white">
@@ -193,11 +203,188 @@
                   title="CPU dalam Core / vCPU"
                 />
               </td>
+
+              <!-- Aksi Hapus -->
+              <td class="px-4 py-3.5 text-center">
+                <button
+                  type="button"
+                  @click="handleDeleteAlternative(alt)"
+                  title="Hapus paket alternatif"
+                  class="text-slate-400 hover:text-rose-600 transition p-1 rounded-md hover:bg-rose-50"
+                >
+                  <Trash2 class="w-4 h-4" />
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </SectionCard>
+
+    <!-- Modal Tambah Alternatif Kustom -->
+    <div
+      v-if="showModal"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+    >
+      <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <div class="bg-indigo-100 text-indigo-700 p-2 rounded-xl">
+              <Plus class="w-5 h-5" />
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800">Simulasi Paket Hosting Baru</h3>
+              <p class="text-xs text-slate-500">Tambahkan paket hosting untuk diuji perankingannya.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            @click="closeModal"
+            class="text-slate-400 hover:text-slate-600 text-xl font-bold leading-none p-1"
+          >
+            &times;
+          </button>
+        </div>
+
+        <form @submit.prevent="submitAddAlternative" class="space-y-3.5 text-xs">
+          <!-- Nama Paket -->
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Nama Paket Hosting <span class="text-rose-500">*</span></label>
+            <input
+              type="text"
+              v-model="newAlt.name"
+              placeholder="Contoh: Biznet Cloud Max"
+              required
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- Penyedia & Kategori -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Penyedia Hosting <span class="text-rose-500">*</span></label>
+              <input
+                type="text"
+                v-model="newAlt.provider"
+                placeholder="Contoh: Biznet Gio"
+                required
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Kategori Layanan</label>
+              <select
+                v-model="newAlt.category"
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              >
+                <option value="Shared Hosting">Shared Hosting</option>
+                <option value="Cloud Hosting">Cloud Hosting</option>
+                <option value="Virtual Private Server">Virtual Private Server (VPS)</option>
+                <option value="Dedicated Server">Dedicated Server</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Spesifikasi Asli (Teks) -->
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Spesifikasi Asli (Keterangan)</label>
+            <input
+              type="text"
+              v-model="newAlt.spec_raw"
+              placeholder="Contoh: 100 GB SSD / 2 GB RAM / 2 Core / Rp50.000"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <!-- 4 Nilai Kriteria -->
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+            <span class="block font-bold text-slate-700 text-xs uppercase tracking-wider">
+              Nilai Numerik Kriteria:
+            </span>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  C1: Harga per bulan (Rp) <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  v-model.number="newAlt.scores.C1"
+                  placeholder="Contoh: 45000"
+                  required
+                  class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  C2: Storage (GB) <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  v-model.number="newAlt.scores.C2"
+                  placeholder="Contoh: 100"
+                  required
+                  class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  C3: RAM (GB) <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  v-model.number="newAlt.scores.C3"
+                  placeholder="Contoh: 2"
+                  required
+                  class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                />
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+                  C4: CPU (vCPU / Core) <span class="text-rose-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  v-model.number="newAlt.scores.C4"
+                  placeholder="Contoh: 2"
+                  required
+                  class="w-full px-3 py-1.5 border border-slate-200 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Aksi Modal -->
+          <div class="pt-2 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              @click="closeModal"
+              class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold transition"
+            >
+              Batal
+            </button>
+
+            <button
+              type="submit"
+              :disabled="isSubmitting"
+              class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-2 rounded-xl transition shadow-sm flex items-center gap-2 disabled:opacity-50"
+            >
+              <Save class="w-4 h-4" />
+              <span>{{ isSubmitting ? 'Menyimpan...' : 'Simpan & Hitung Ranking' }}</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -212,6 +399,9 @@ import {
   Info,
   CheckCircle2,
   AlertCircle,
+  Plus,
+  Trash2,
+  Save,
 } from 'lucide-vue-next';
 
 const {
@@ -221,12 +411,29 @@ const {
   fetchAlternatives,
   setProvider,
   updateScores,
+  addAlternative,
+  deleteAlternative,
   resetToDefault,
 } = useSpk();
 
 const isUpdating = ref(false);
+const isSubmitting = ref(false);
 const statusMessage = ref('');
 const statusType = ref('success');
+const showModal = ref(false);
+
+const newAlt = ref({
+  name: '',
+  provider: 'Hostinger',
+  category: 'Shared Hosting',
+  spec_raw: '',
+  scores: {
+    C1: '',
+    C2: '',
+    C3: '',
+    C4: '',
+  },
+});
 
 const filteredAlternatives = computed(() => {
   if (!provider.value) return alternatives.value;
@@ -248,8 +455,65 @@ function onSelectProvider(selected) {
   setProvider(selected);
 }
 
+function openAddModal() {
+  newAlt.value = {
+    name: '',
+    provider: 'Hostinger',
+    category: 'Shared Hosting',
+    spec_raw: '',
+    scores: {
+      C1: '',
+      C2: '',
+      C3: '',
+      C4: '',
+    },
+  };
+  showModal.value = true;
+}
+
+function closeModal() {
+  showModal.value = false;
+}
+
+async function submitAddAlternative() {
+  try {
+    isSubmitting.value = true;
+    await addAlternative(newAlt.value);
+    showModal.value = false;
+    statusType.value = 'success';
+    statusMessage.value = `Paket "${newAlt.value.name}" berhasil ditambahkan ke dalam perankingan!`;
+    setTimeout(() => {
+      statusMessage.value = '';
+    }, 4000);
+  } catch (err) {
+    statusType.value = 'error';
+    statusMessage.value = err.message || 'Gagal menambahkan paket hosting.';
+  } finally {
+    isSubmitting.value = false;
+  }
+}
+
+async function handleDeleteAlternative(alt) {
+  if (!confirm(`Apakah Anda yakin ingin menghapus paket "${alt.name}" (${alt.code})?`)) {
+    return;
+  }
+  try {
+    isUpdating.value = true;
+    await deleteAlternative(alt.id);
+    statusType.value = 'success';
+    statusMessage.value = `Paket "${alt.name}" berhasil dihapus.`;
+    setTimeout(() => {
+      statusMessage.value = '';
+    }, 3000);
+  } catch (err) {
+    statusType.value = 'error';
+    statusMessage.value = 'Gagal menghapus alternatif.';
+  } finally {
+    isUpdating.value = false;
+  }
+}
+
 async function onScoreChange(altId, criterionCode, rawValue) {
-  // Parsing angka, mengizinkan koma sebagai titik
   const normalizedValue = rawValue.replace(',', '.').trim();
   const parsed = normalizedValue === '' ? null : parseFloat(normalizedValue);
 
@@ -259,7 +523,6 @@ async function onScoreChange(altId, criterionCode, rawValue) {
     return;
   }
 
-  // Cari alternatif yang bersangkutan
   const targetAlt = alternatives.value.find((a) => a.id === altId);
   if (!targetAlt) return;
 
@@ -290,7 +553,7 @@ async function handleReset() {
     isUpdating.value = true;
     await resetToDefault();
     statusType.value = 'success';
-    statusMessage.value = 'Seluruh data alternatif berhasil direset ke nilai awal!';
+    statusMessage.value = 'Seluruh data alternatif berhasil direset ke nilai awal seeder!';
     setTimeout(() => {
       statusMessage.value = '';
     }, 4000);

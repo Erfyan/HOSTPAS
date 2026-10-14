@@ -117,6 +117,44 @@ export function useSpk() {
     }
 
     /**
+     * Menambahkan paket hosting baru untuk simulasi
+     */
+    async function addAlternative(payload) {
+        try {
+            loading.value = true;
+            error.value = null;
+            await api.addAlternative(payload);
+            await fetchAlternatives();
+            await fetchWaspas();
+            return true;
+        } catch (err) {
+            error.value = err.message || 'Gagal menambahkan paket hosting';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    /**
+     * Menghapus paket hosting alternatif
+     */
+    async function deleteAlternative(id) {
+        try {
+            loading.value = true;
+            error.value = null;
+            await api.deleteAlternative(id);
+            await fetchAlternatives();
+            await fetchWaspas();
+            return true;
+        } catch (err) {
+            error.value = err.message || 'Gagal menghapus alternatif';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    /**
      * Reset default ke database seeder
      */
     async function resetToDefault() {
@@ -183,6 +221,8 @@ export function useSpk() {
         setProvider,
         updateCriteria,
         updateScores,
+        addAlternative,
+        deleteAlternative,
         resetToDefault,
     };
 }

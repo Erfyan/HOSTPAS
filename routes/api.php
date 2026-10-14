@@ -13,6 +13,8 @@ Route::put('/criteria', [CriterionController::class, 'update']);
 
 // Alternatif & Nilai
 Route::get('/alternatives', [AlternativeController::class, 'index']);
+Route::post('/alternatives', [AlternativeController::class, 'store']);
+Route::delete('/alternatives/{id}', [AlternativeController::class, 'destroy']);
 Route::put('/alternatives/{id}/scores', [ScoreController::class, 'update']);
 
 // Perhitungan WASPAS

@@ -49,6 +49,29 @@ export const api = {
     },
 
     /**
+     * Menambahkan alternatif hosting baru untuk simulasi
+     */
+    async addAlternative(payload) {
+        const res = await fetch('/api/alternatives', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+        });
+        return handleResponse(res);
+    },
+
+    /**
+     * Menghapus alternatif hosting
+     */
+    async deleteAlternative(id) {
+        const res = await fetch(`/api/alternatives/${id}`, {
+            method: 'DELETE',
+            headers,
+        });
+        return handleResponse(res);
+    },
+
+    /**
      * Memperbarui skor/nilai kriteria suatu alternatif
      */
     async updateScores(alternativeId, scores) {
