@@ -1,8 +1,22 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\AlternativeController;
+use App\Http\Controllers\CriterionController;
+use App\Http\Controllers\ResetController;
+use App\Http\Controllers\ScoreController;
+use App\Http\Controllers\WaspasController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Kriteria
+Route::get('/criteria', [CriterionController::class, 'index']);
+Route::put('/criteria', [CriterionController::class, 'update']);
+
+// Alternatif & Nilai
+Route::get('/alternatives', [AlternativeController::class, 'index']);
+Route::put('/alternatives/{id}/scores', [ScoreController::class, 'update']);
+
+// Perhitungan WASPAS
+Route::get('/waspas', [WaspasController::class, 'index']);
+
+// Reset Default
+Route::post('/reset', [ResetController::class, 'reset']);
