@@ -39,6 +39,8 @@
     "APP_NAME": "HOSTPAS",
     "APP_ENV": "production",
     "APP_DEBUG": "false",
+    "APP_URL": "https://hostpas.vercel.app",
+    "ASSET_URL": "https://hostpas.vercel.app",
     "APP_KEY": "base64:yKwyqceWgR4RhX1oXRz9KvRPtesoAo408zpUYjaCQuo=",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
