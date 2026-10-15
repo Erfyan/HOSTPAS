@@ -61,6 +61,18 @@ export const api = {
     },
 
     /**
+     * Memperbarui informasi data alternatif hosting
+     */
+    async updateAlternative(id, payload) {
+        const res = await fetch(`/api/alternatives/${id}`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify(payload),
+        });
+        return handleResponse(res);
+    },
+
+    /**
      * Menghapus alternatif hosting
      */
     async deleteAlternative(id) {
@@ -100,6 +112,17 @@ export const api = {
      */
     async resetDefault() {
         const res = await fetch('/api/reset', {
+            method: 'POST',
+            headers,
+        });
+        return handleResponse(res);
+    },
+
+    /**
+     * Memuat dataset kasus uji penelitian jurnal Bab 3.5 (Hosting A-E)
+     */
+    async loadJournalCase() {
+        const res = await fetch('/api/load-journal-case', {
             method: 'POST',
             headers,
         });

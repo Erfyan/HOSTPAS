@@ -54,10 +54,7 @@ class AlternativeController extends Controller
             'category' => 'nullable|string|max:255',
             'spec_raw' => 'nullable|string',
             'scores' => 'required|array',
-            'scores.C1' => 'required|numeric|min:0',
-            'scores.C2' => 'required|numeric|min:0',
-            'scores.C3' => 'required|numeric|min:0',
-            'scores.C4' => 'required|numeric|min:0',
+            'scores.*' => 'required|numeric|min:0',
         ]);
 
         // Tentukan kode unik berikutnya
@@ -93,6 +90,29 @@ class AlternativeController extends Controller
             'message' => 'Paket hosting alternatif berhasil ditambahkan ke simulasi',
             'data' => $alternative,
         ], 201);
+    }
+
+    /**
+     * Memperbarui informasi data alternatif hosting
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $alternative = Alternative::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'provider' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'spec_raw' => 'nullable|string',
+        ]);
+
+        $alternative->update($validated);
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Data alternatif berhasil diperbarui',
+            'data' => $alternative,
+        ]);
     }
 
     /**

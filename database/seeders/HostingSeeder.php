@@ -249,5 +249,10 @@ class HostingSeeder extends Seeder
                 }
             }
         }
+
+        // Hapus kriteria atau alternatif tambahan jika sebelumnya menggunakan preset lain
+        $seededAltCodes = array_column($alternativesData, 'code');
+        Alternative::whereNotIn('code', $seededAltCodes)->delete();
+        Criterion::whereNotIn('code', ['C1', 'C2', 'C3', 'C4'])->delete();
     }
 }

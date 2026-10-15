@@ -8,9 +8,9 @@
           <th class="px-6 py-3.5">Paket Hosting</th>
           <th class="px-6 py-3.5">Penyedia</th>
           <th class="px-6 py-3.5">Kategori</th>
-          <th v-if="showDetails" class="px-6 py-3.5 text-right">Skor SAW (Q<sup>1</sup>)</th>
-          <th v-if="showDetails" class="px-6 py-3.5 text-right">Skor WP (Q<sup>2</sup>)</th>
-          <th class="px-6 py-3.5 text-right">Nilai Akhir (Q<sub>i</sub>)</th>
+          <th v-if="showDetails" class="px-6 py-3.5 text-right font-mono">Q1 (WSM)</th>
+          <th v-if="showDetails" class="px-6 py-3.5 text-right font-mono">Q2 (WPM)</th>
+          <th class="px-6 py-3.5 text-right font-mono font-bold text-indigo-700">Q Akhir (WASPAS)</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100 bg-white">

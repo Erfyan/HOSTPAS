@@ -146,4 +146,48 @@ class WaspasApiTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('ok', true);
     }
+
+    /**
+     * Test API endpoint PUT /api/alternatives/{id} (Ubah Data Alternatif)
+     */
+    public function test_update_alternative_endpoint(): void
+    {
+        $alt = Alternative::first();
+
+        $response = $this->putJson("/api/alternatives/{$alt->id}", [
+            'name' => 'Hostinger Single Updated',
+            'provider' => 'Hostinger Global',
+            'category' => 'Cloud Web',
+            'spec_raw' => '60 GB / 2 GB / Shared',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('ok', true)
+            ->assertJsonPath('data.name', 'Hostinger Single Updated');
+
+        $this->assertDatabaseHas('alternatives', [
+            'id' => $alt->id,
+            'name' => 'Hostinger Single Updated',
+        ]);
+    }
+
+    /**
+     * Test API endpoint POST /api/load-journal-case (Kasus Uji Bab 3.5)
+     */
+    public function test_load_journal_case_endpoint(): void
+    {
+        $response = $this->postJson('/api/load-journal-case');
+        $response->assertOk()
+            ->assertJsonPath('ok', true);
+
+        // Pastikan terisi 5 alternatif dan 5 kriteria sesuai Bab 3.5
+        $this->assertEquals(5, Alternative::count());
+        $this->assertEquals(5, Criterion::count());
+
+        // Pastikan Hosting B ada dan menempati ranking 1 di WASPAS
+        $waspasResponse = $this->getJson('/api/waspas?lambda=0.5');
+        $waspasResponse->assertOk();
+        $topAlt = collect($waspasResponse->json('alternatives'))->firstWhere('rank', 1);
+        $this->assertEquals('Hosting B', $topAlt['name']);
+    }
 }

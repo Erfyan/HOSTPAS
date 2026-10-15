@@ -174,6 +174,46 @@ export function useSpk() {
         }
     }
 
+    /**
+     * Memperbarui data alternatif hosting (nama, provider, category, spec_raw)
+     */
+    async function updateAlternative(id, payload) {
+        try {
+            loading.value = true;
+            error.value = null;
+            await api.updateAlternative(id, payload);
+            await fetchAlternatives();
+            await fetchWaspas();
+            return true;
+        } catch (err) {
+            error.value = err.message || 'Gagal memperbarui data alternatif';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    }
+
+    /**
+     * Memuat dataset penelitian jurnal Bab 3.5 (Hosting A-E)
+     */
+    async function loadJournalDataset() {
+        try {
+            loading.value = true;
+            error.value = null;
+            provider.value = '';
+            await api.loadJournalCase();
+            await fetchCriteria();
+            await fetchAlternatives();
+            await fetchWaspas();
+            return true;
+        } catch (err) {
+            error.value = err.message || 'Gagal memuat dataset jurnal';
+            throw err;
+        } finally {
+            loading.value = false;
+        }
+    }
+
     // Top 5 alternatif teratas
     const top5 = computed(() => {
         if (!result.value?.alternatives) return [];
@@ -199,7 +239,15 @@ export function useSpk() {
         return Math.abs(totalWeight.value - 1.0) <= 0.0001;
     });
 
-    const providersList = ['Hostinger', 'Niagahoster', 'Rumahweb', 'IDCloudHost'];
+    // Daftar penyedia hosting dinamis berdasarkan data alternatif
+    const providersList = computed(() => {
+        const set = new Set();
+        alternatives.value.forEach(a => {
+            if (a.provider) set.add(a.provider);
+        });
+        if (set.size === 0) return ['Hostinger', 'Niagahoster', 'Rumahweb', 'IDCloudHost'];
+        return Array.from(set);
+    });
 
     return {
         criteria,
@@ -222,7 +270,9 @@ export function useSpk() {
         updateCriteria,
         updateScores,
         addAlternative,
+        updateAlternative,
         deleteAlternative,
         resetToDefault,
+        loadJournalDataset,
     };
 }

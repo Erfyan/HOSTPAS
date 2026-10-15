@@ -20,8 +20,9 @@
           </div>
         </router-link>
 
-        <!-- Navigation Tabs -->
+        <!-- Navigation Tabs (Sesuai 3.4 Implementasi Sistem) -->
         <nav class="bg-indigo-700/50 p-1.5 rounded-xl border border-indigo-500/30 flex items-center gap-1 overflow-x-auto">
+          <!-- Halaman Utama (Gambar 3) -->
           <router-link
             to="/"
             v-slot="{ isActive, navigate }"
@@ -30,8 +31,8 @@
             <button
               @click="navigate"
               :class="[
-                'px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 whitespace-nowrap',
-                isActive ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:bg-indigo-600'
+                'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap',
+                isActive ? 'bg-white text-indigo-700 shadow-sm font-semibold' : 'text-indigo-100 hover:bg-indigo-600'
               ]"
             >
               <LayoutDashboard class="w-4 h-4" />
@@ -39,6 +40,25 @@
             </button>
           </router-link>
 
+          <!-- Halaman Data Alternatif (Gambar 4) -->
+          <router-link
+            to="/data-alternatif"
+            v-slot="{ isActive, navigate }"
+            custom
+          >
+            <button
+              @click="navigate"
+              :class="[
+                'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap',
+                isActive ? 'bg-white text-indigo-700 shadow-sm font-semibold' : 'text-indigo-100 hover:bg-indigo-600'
+              ]"
+            >
+              <Layers class="w-4 h-4" />
+              <span>Data Alternatif</span>
+            </button>
+          </router-link>
+
+          <!-- Halaman Kriteria dan Bobot (Gambar 5) -->
           <router-link
             to="/kriteria"
             v-slot="{ isActive, navigate }"
@@ -47,46 +67,48 @@
             <button
               @click="navigate"
               :class="[
-                'px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 whitespace-nowrap',
-                isActive ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:bg-indigo-600'
+                'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap',
+                isActive ? 'bg-white text-indigo-700 shadow-sm font-semibold' : 'text-indigo-100 hover:bg-indigo-600'
               ]"
             >
               <Sliders class="w-4 h-4" />
-              <span>Kriteria</span>
+              <span>Kriteria & Bobot</span>
             </button>
           </router-link>
 
+          <!-- Halaman Penilaian (Gambar 6) -->
           <router-link
-            to="/alternatif"
+            to="/penilaian"
             v-slot="{ isActive, navigate }"
             custom
           >
             <button
               @click="navigate"
               :class="[
-                'px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 whitespace-nowrap',
-                isActive ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:bg-indigo-600'
+                'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap',
+                isActive ? 'bg-white text-indigo-700 shadow-sm font-semibold' : 'text-indigo-100 hover:bg-indigo-600'
               ]"
             >
-              <Layers class="w-4 h-4" />
-              <span>Alternatif & Nilai</span>
+              <Edit class="w-4 h-4" />
+              <span>Penilaian</span>
             </button>
           </router-link>
 
+          <!-- Halaman Hasil Penilaian (Gambar 7) -->
           <router-link
-            to="/perhitungan"
+            to="/hasil-penilaian"
             v-slot="{ isActive, navigate }"
             custom
           >
             <button
               @click="navigate"
               :class="[
-                'px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-2 whitespace-nowrap',
-                isActive ? 'bg-white text-indigo-700 shadow-sm' : 'text-indigo-100 hover:bg-indigo-600'
+                'px-3.5 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap',
+                isActive ? 'bg-white text-indigo-700 shadow-sm font-semibold' : 'text-indigo-100 hover:bg-indigo-600'
               ]"
             >
               <Calculator class="w-4 h-4" />
-              <span>Perhitungan WASPAS</span>
+              <span>Hasil Penilaian</span>
             </button>
           </router-link>
         </nav>
@@ -96,5 +118,5 @@
 </template>
 
 <script setup>
-import { Server, LayoutDashboard, Sliders, Layers, Calculator } from 'lucide-vue-next';
+import { Server, LayoutDashboard, Sliders, Layers, Edit, Calculator } from 'lucide-vue-next';
 </script>

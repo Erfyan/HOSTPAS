@@ -3,17 +3,33 @@
     <!-- Header Page Info -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
+        <div class="inline-flex items-center gap-2 mb-1">
+          <span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-0.5 rounded-full">
+            Gambar 5 &bull; Implementasi 3.4
+          </span>
+        </div>
         <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
           <Sliders class="w-6 h-6 text-indigo-600" />
-          Manajemen Kriteria & Pembobotan
+          Halaman Kriteria dan Bobot
         </h1>
         <p class="text-sm text-slate-500 mt-1">
-          Ubah bobot preferensi dan jenis atribut (Benefit atau Cost). Sistem otomatis menormalkan bobot jika total bobot berbeda dari 1 (100%).
+          Mengatur kriteria, tipe (benefit/cost), dan bobot preferensi, serta menampilkan indikator total bobot yang harus bernilai 1.
         </p>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-2 self-start sm:self-auto">
+      <div class="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+        <button
+          type="button"
+          @click="handleLoadJournalCase"
+          :disabled="isSaving"
+          class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 font-semibold text-sm px-3.5 py-2.5 rounded-xl transition flex items-center gap-2 disabled:opacity-50"
+          title="Muat 5 kriteria riset Bab 3.5 (Harga, Storage, Respon, Uptime, Dukungan Teknis)"
+        >
+          <BookOpen class="w-4 h-4 text-purple-600" />
+          <span>Kasus Uji Jurnal (Bab 3.5)</span>
+        </button>
+
         <button
           type="button"
           @click="handleReset"
@@ -168,6 +184,7 @@ import {
   CheckCircle2,
   AlertCircle,
   AlertTriangle,
+  BookOpen,
 } from 'lucide-vue-next';
 
 const {
@@ -177,6 +194,7 @@ const {
   fetchCriteria,
   updateCriteria,
   resetToDefault,
+  loadJournalDataset,
 } = useSpk();
 
 const editableCriteria = ref([]);
@@ -249,6 +267,26 @@ async function handleReset() {
   } catch (err) {
     statusType.value = 'error';
     statusMessage.value = 'Gagal mereset data default';
+  } finally {
+    isSaving.value = false;
+  }
+}
+
+async function handleLoadJournalCase() {
+  if (!confirm('Muat dataset kasus uji penelitian jurnal Bab 3.5 (5 Kriteria & 5 Hosting A-E)?')) {
+    return;
+  }
+  try {
+    isSaving.value = true;
+    await loadJournalDataset();
+    statusType.value = 'success';
+    statusMessage.value = 'Dataset penelitian jurnal Bab 3.5 berhasil dimuat!';
+    setTimeout(() => {
+      statusMessage.value = '';
+    }, 4000);
+  } catch (err) {
+    statusType.value = 'error';
+    statusMessage.value = 'Gagal memuat dataset jurnal';
   } finally {
     isSaving.value = false;
   }

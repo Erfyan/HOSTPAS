@@ -14,11 +14,14 @@ Route::put('/criteria', [CriterionController::class, 'update']);
 // Alternatif & Nilai
 Route::get('/alternatives', [AlternativeController::class, 'index']);
 Route::post('/alternatives', [AlternativeController::class, 'store']);
+Route::put('/alternatives/{id}', [AlternativeController::class, 'update']);
 Route::delete('/alternatives/{id}', [AlternativeController::class, 'destroy']);
 Route::put('/alternatives/{id}/scores', [ScoreController::class, 'update']);
 
 // Perhitungan WASPAS
 Route::get('/waspas', [WaspasController::class, 'index']);
 
-// Reset Default
+// Reset & Preset Dataset
 Route::post('/reset', [ResetController::class, 'reset']);
+Route::post('/load-journal-case', [ResetController::class, 'loadJournalCase']);
+
