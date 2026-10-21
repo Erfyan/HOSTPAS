@@ -6,6 +6,7 @@ use App\Models\Alternative;
 use App\Models\Criterion;
 use App\Models\Score;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class HostingSeeder extends Seeder
 {
@@ -46,19 +47,8 @@ class HostingSeeder extends Seeder
             ],
         ];
 
-        $criteriaMap = [];
-        foreach ($criteriaData as $item) {
-            $criterion = Criterion::updateOrCreate(
-                ['code' => $item['code']],
-                [
-                    'name' => $item['name'],
-                    'unit' => $item['unit'],
-                    'type' => $item['type'],
-                    'weight' => $item['weight'],
-                ]
-            );
-            $criteriaMap[$item['code']] = $criterion->id;
-        }
+        Criterion::upsert($criteriaData, ['code'], ['name', 'unit', 'type', 'weight']);
+        $criteriaMap = Criterion::pluck('id', 'code')->toArray();
 
         // 2. Data Alternatif & Skor Konversi
         $alternativesData = [
@@ -224,31 +214,36 @@ class HostingSeeder extends Seeder
             ],
         ];
 
+        $altsToUpsert = array_map(function ($alt) {
+            return [
+                'code' => $alt['code'],
+                'provider' => $alt['provider'],
+                'name' => $alt['name'],
+                'category' => $alt['category'],
+                'spec_raw' => $alt['spec_raw'],
+            ];
+        }, $alternativesData);
+
+        Alternative::upsert($altsToUpsert, ['code'], ['provider', 'name', 'category', 'spec_raw']);
+        $altMap = Alternative::pluck('id', 'code')->toArray();
+
+        $scoresToUpsert = [];
         foreach ($alternativesData as $altData) {
-            $alternative = Alternative::updateOrCreate(
-                ['code' => $altData['code']],
-                [
-                    'provider' => $altData['provider'],
-                    'name' => $altData['name'],
-                    'category' => $altData['category'],
-                    'spec_raw' => $altData['spec_raw'],
-                ]
-            );
+            $altId = $altMap[$altData['code']] ?? null;
+            if (!$altId) continue;
 
             foreach ($altData['scores'] as $critCode => $val) {
                 if (isset($criteriaMap[$critCode])) {
-                    Score::updateOrCreate(
-                        [
-                            'alternative_id' => $alternative->id,
-                            'criterion_id' => $criteriaMap[$critCode],
-                        ],
-                        [
-                            'value' => $val,
-                        ]
-                    );
+                    $scoresToUpsert[] = [
+                        'alternative_id' => $altId,
+                        'criterion_id' => $criteriaMap[$critCode],
+                        'value' => $val,
+                    ];
                 }
             }
         }
+
+        Score::upsert($scoresToUpsert, ['alternative_id', 'criterion_id'], ['value']);
 
         // Hapus kriteria atau alternatif tambahan jika sebelumnya menggunakan preset lain
         $seededAltCodes = array_column($alternativesData, 'code');
